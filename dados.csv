@@ -1,0 +1,364 @@
+data,codigo,processo,qtd,status,deposito_destino
+03/12/2024,496935,S Usinagem,286,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,032233,S Usinagem,262,ok,
+03/12/2024,036174,S Usinagem,252,ok,
+03/12/2024,030326,S Usinagem,191,ok,
+03/12/2024,491342,S Usinagem,150,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,025473,S Usinagem,147,ok,
+03/12/2024,444947,S Usinagem,144,ok,Almox Cx Acessórios - Almoxarifado Caixas de Acessórios
+03/12/2024,443359,S Usinagem,139,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,400245,S Usinagem,124,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,036173,S Usinagem,111,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,032365,S Usinagem,110,ok,
+03/12/2024,481040,S Usinagem,100,ok,Almox Corte e Estamparia - Almoxarifado Corte e Estamparia
+03/12/2024,034946,S Usinagem,91,"Erro
+Saldo insuficiente neste apontamento.
+Erro: Saldo insuficiente (-44,000), Recurso: ""034946 - BUCHA DO PISTÃO [PISTÃO DO CILINDRO - CBH/CBHM] (85779419)"", Depósito: ""Almox Usinagem (138591)"", Lote: """", Lote ativo: """", Etapa: ""85779420"", Data: ""05/12/2024.
+Código do erro: 25 (ErpError.SALDO_INSUFICIENTE)
+
+Solução: Tente criar uma nova produção
+ou aborte a operação para poder iniciar uma nova.
+
+Exibir detalhes
+
+
+
+
+
+Ok",Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,025839,S Usinagem,85,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,025073,S Usinagem,83,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,035713,S Usinagem,80,"Erro
+Saldo insuficiente neste apontamento.
+Erro: Saldo insuficiente (-80,000), Recurso: ""035713 - PARAFUSO LAMINA METISA [ROCAX1800] (89652416)"", Depósito: ""Almox Forjaria (138590)"", Lote: """", Lote ativo: """", Etapa: ""89057901"", Data: ""03/12/2024.
+Código do erro: 25 (ErpError.SALDO_INSUFICIENTE)
+
+Solução: Tente criar uma nova produção
+ou aborte a operação para poder iniciar uma nova.
+
+Exibir detalhes
+
+
+
+
+
+Ok",Almox Usinagem - Almoxarifado Usinagem
+03/12/2024,486553,S Usinagem,80,ok,Almox Cx Acessórios - Almoxarifado Caixas de Acessórios
+03/12/2024,444698,S Usinagem,73,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,416009,S Usinagem,69,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,483254,S Usinagem,60,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,028681,S Usinagem,54,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,028877,S Usinagem,47,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,032421,S Usinagem,43,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,427986,S Usinagem,41,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,030327,S Usinagem,40,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,025833,S Usinagem,35,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,025472,S Usinagem,34,ok,Almox Cx Acessórios - Almoxarifado Caixas de Acessórios
+03/12/2024,031865,S Usinagem,33,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,033109,S Usinagem,29,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,423622,S Usinagem,26,ok,Almox Prod Especiais - Almox Produtos Especiais
+03/12/2024,035815,S Usinagem,24,ok,Almox Prod Especiais - Almox Produtos Especiais
+03/12/2024,036047,S Usinagem,20,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,443876,S Usinagem,20,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,035105,S Usinagem,20,ok,Almox Prod Especiais - Almox Produtos Especiais
+03/12/2024,034682,S Usinagem,18,ok,Almox Prod Especiais - Almox Produtos Especiais
+03/12/2024,025119,S Usinagem,18,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,423683,S Usinagem,18,"Erro
+Saldo insuficiente neste apontamento.
+Erro: Saldo insuficiente (-2,000), Recurso: ""423683 - SUPORTE DA TORRE C/FURO    RX03 (157825)"", Depósito: ""Almox Usinagem (138591)"", Lote: """", Lote ativo: """", Etapa: ""89704809"", Data: ""03/12/2024.
+Código do erro: 25 (ErpError.SALDO_INSUFICIENTE)
+
+Solução: Tente criar uma nova produção
+ou aborte a operação para poder iniciar uma nova.
+
+Exibir detalhes
+
+
+
+
+
+Ok",Almox Prod Especiais - Almox Produtos Especiais
+03/12/2024,034737,S Usinagem,18,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,035243,S Usinagem,16,ok,Almox Prod Especiais - Almox Produtos Especiais
+03/12/2024,035296,S Usinagem,16,ok,Almox Prod Especiais - Almox Produtos Especiais
+03/12/2024,026070,S Usinagem,16,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,033131,S Usinagem,14,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,417294,S Usinagem,13,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,031213,S Usinagem,11,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,035316,S Usinagem,11,ok,Almox Mont Rotativas - Almox Montagem Rotativas
+03/12/2024,030338,S Usinagem,11,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,035456,S Usinagem,11,ok,
+03/12/2024,035367,S Usinagem,11,ok,Almox Prod Especiais - Almox Produtos Especiais
+03/12/2024,034881,S Usinagem,10,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,033313,S Usinagem,10,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,035407,S Usinagem,10,ok,Almox Prod Especiais - Almox Produtos Especiais
+03/12/2024,033743,S Usinagem,10,ok,Almox Prod Especiais - Almox Produtos Especiais
+03/12/2024,032417,S Usinagem,10,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,033435,S Usinagem,10,ok,Almox Cx Acessórios - Almoxarifado Caixas de Acessórios
+03/12/2024,033654,S Usinagem,10,ok,Almox Corte e Estamparia - Almoxarifado Corte e Estamparia
+03/12/2024,494720,S Usinagem,10,ok,Almox Tratamento Térmico - Almoxarifado Tratamento Térmico
+03/12/2024,032666,S Usinagem,9,"Erro
+Saldo insuficiente neste apontamento.
+Erro: Saldo insuficiente (-2,000), Recurso: ""032666 - ESTRUTURA U [GAIOLA KIT INCENDIO - FTC] (77317309)"", Depósito: ""Almox Usinagem (138591)"", Lote: """", Lote ativo: """", Etapa: ""77317310"", Data: ""16/12/2024.
+Código do erro: 25 (ErpError.SALDO_INSUFICIENTE)
+
+Solução: Tente criar uma nova produção
+ou aborte a operação para poder iniciar uma nova.
+
+Exibir detalhes
+
+
+
+
+
+Ok",Almox Corte e Estamparia - Almoxarifado Corte e Estamparia
+03/12/2024,035468,S Usinagem,8,ok,Almox Prod Especiais - Almox Produtos Especiais
+03/12/2024,035469,S Usinagem,8,ok,Almox Prod Especiais - Almox Produtos Especiais
+03/12/2024,035470,S Usinagem,8,ok,Almox Prod Especiais - Almox Produtos Especiais
+03/12/2024,450133,S Usinagem,8,ok,Almox Cx Acessórios - Almoxarifado Caixas de Acessórios
+03/12/2024,026021,S Usinagem,8,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,035574,S Usinagem,8,ok,Almox Prod Especiais - Almox Produtos Especiais
+03/12/2024,031243,S Usinagem,7,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,032249,S Usinagem,7,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,478090,S Usinagem,6,ok,Almox Corte e Estamparia - Almoxarifado Corte e Estamparia
+03/12/2024,035453,S Usinagem,6,ok,Almox Prod Especiais - Almox Produtos Especiais
+03/12/2024,035308,S Usinagem,6,ok,Almox Mont Rotativas - Almox Montagem Rotativas
+03/12/2024,032667,S Usinagem,6,ok,Almox Corte e Estamparia - Almoxarifado Corte e Estamparia
+03/12/2024,033376,S Usinagem,6,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,033352,S Usinagem,6,ok,Almox Cx Acessórios - Almoxarifado Caixas de Acessórios
+03/12/2024,035636,S Usinagem,6,ok,Almox Prod Especiais - Almox Produtos Especiais
+03/12/2024,027065,S Usinagem,6,ok,Almox Prod Especiais - Almox Produtos Especiais
+03/12/2024,034704,S Usinagem,6,ok,Almox Prod Especiais - Almox Produtos Especiais
+03/12/2024,035955,S Usinagem,5,ok,Almox Prod Especiais - Almox Produtos Especiais
+03/12/2024,032302,S Usinagem,5,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,035591,S Usinagem,5,ok,Almox Prod Especiais - Almox Produtos Especiais
+03/12/2024,034705,S Usinagem,5,ok,Almox Prod Especiais - Almox Produtos Especiais
+03/12/2024,034132,S Usinagem,4,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,033434,S Usinagem,4,ok,Almox Pintura - Embalagem - Almox Pintura - Embalagem
+03/12/2024,031165,S Usinagem,4,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,035349,S Usinagem,4,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,032299,S Usinagem,4,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,033467,S Usinagem,4,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,033466,S Usinagem,4,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,035489,S Usinagem,4,ok,Almox Prod Especiais - Almox Produtos Especiais
+03/12/2024,032268,S Usinagem,3,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,035305,S Usinagem,3,ok,Almox Mont Rotativas - Almox Montagem Rotativas
+03/12/2024,035628,S Usinagem,3,ok,Almox Prod Especiais - Almox Produtos Especiais
+03/12/2024,417269,S Usinagem,3,"Erro
+Saldo insuficiente neste apontamento.
+Erro: Saldo insuficiente (-3,000), Recurso: ""417269 - COMPLEM - HASTE (M03)  ROCAX (157337)"", Depósito: ""Almox Corte e Estamparia (138589)"", Lote: """", Lote ativo: """", Etapa: ""9973368"", Data: ""03/12/2024.
+Código do erro: 25 (ErpError.SALDO_INSUFICIENTE)
+
+Solução: Tente criar uma nova produção
+ou aborte a operação para poder iniciar uma nova.
+
+Exibir detalhes
+
+
+
+
+
+Ok",Almox Usinagem - Almoxarifado Usinagem
+03/12/2024,032312,S Usinagem,3,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,033823,S Usinagem,3,ok,Almox Corte e Estamparia - Almoxarifado Corte e Estamparia
+03/12/2024,033792,S Usinagem,2,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,029217,S Usinagem,2,"Erro
+Saldo insuficiente neste apontamento.
+Erro: Saldo insuficiente (-2,000), Recurso: ""029217 - TUBO VARIÁVEL BRAÇO - PRÉ-ENCANTEIRADOR (60202444)"", Depósito: ""Almox Usinagem (138591)"", Lote: """", Lote ativo: """", Etapa: ""60202445"", Data: ""07/12/2024.
+Código do erro: 25 (ErpError.SALDO_INSUFICIENTE)
+
+Solução: Tente criar uma nova produção
+ou aborte a operação para poder iniciar uma nova.
+
+Exibir detalhes
+
+
+
+
+
+Ok",Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,025810,S Usinagem,2,ok,Almox Corte e Estamparia - Almoxarifado Corte e Estamparia
+03/12/2024,034435,S Usinagem,2,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,032432,S Usinagem,2,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,033292,S Usinagem,2,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,496819,S Usinagem,2,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,032232,S Usinagem,2,"Erro
+Saldo insuficiente neste apontamento.
+Erro: Saldo insuficiente (-2,000), Recurso: ""032232 - PINO DO BRACO - TANDEM CBH/CBHM M20 (72819349)"", Depósito: ""Almox Usinagem (138591)"", Lote: """", Lote ativo: """", Etapa: ""72819350"", Data: ""09/12/2024.
+Código do erro: 25 (ErpError.SALDO_INSUFICIENTE)
+
+Solução: Tente criar uma nova produção
+ou aborte a operação para poder iniciar uma nova.
+
+Exibir detalhes
+
+
+
+
+
+Ok",Almox Cx Acessórios - Almoxarifado Caixas de Acessórios
+03/12/2024,032265,S Usinagem,1,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,032275,S Usinagem,1,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,032949,S Usinagem,1,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,033128,S Usinagem,1,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,035364,S Usinagem,1,ok,Almox Prod Especiais - Almox Produtos Especiais
+03/12/2024,032287,S Usinagem,1,ok,
+03/12/2024,032277,S Usinagem,1,ok,Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,496996,S Usinagem,171,ok,Almox Cx Acessórios - Almoxarifado Caixas de Acessórios
+03/12/2024,496959,S Usinagem,90,ok,Almox Usinagem - Almoxarifado Usinagem
+03/12/2024,410147,S Usinagem,72,ok,
+03/12/2024,025993,S Usinagem,66,"Erro
+Saldo insuficiente neste apontamento.
+Erro: Saldo insuficiente (-66,000), Recurso: ""025993 - EIXO DO ROLO MENOR - ROBUSTA (51355353)"", Depósito: ""Almox Usinagem (138591)"", Lote: """", Lote ativo: """", Etapa: ""51355354"", Data: ""03/12/2024.
+Código do erro: 25 (ErpError.SALDO_INSUFICIENTE)
+
+Solução: Tente criar uma nova produção
+ou aborte a operação para poder iniciar uma nova.
+
+Exibir detalhes
+
+
+
+
+
+Ok",Almox Mont Robusta - Almoxarifado Montagem Robusta
+03/12/2024,029219,S Usinagem,56,"Erro
+Saldo insuficiente neste apontamento.
+Erro: Saldo insuficiente (-45,000), Recurso: ""029219 - ENCAIXE DO DISCO DENTADO [PEC6000] (60222249)"", Depósito: ""Almox Usinagem (138591)"", Lote: """", Lote ativo: """", Etapa: ""60222250"", Data: ""03/12/2024.
+Código do erro: 25 (ErpError.SALDO_INSUFICIENTE)
+
+Solução: Tente criar uma nova produção
+ou aborte a operação para poder iniciar uma nova.
+
+Exibir detalhes
+
+
+
+
+
+Ok",Almox Prod Especiais - Almox Produtos Especiais
+03/12/2024,030387,S Usinagem,38,ok,
+03/12/2024,025445,S Usinagem,28,"Erro
+Saldo insuficiente neste apontamento.
+Erro: Saldo insuficiente (-28,000), Recurso: ""025445 - PINO LIM GIRO - SUP EIXO CBH-8 (29116821)"", Depósito: ""Almox Usinagem (138591)"", Lote: """", Lote ativo: """", Etapa: ""29116822"", Data: ""03/12/2024.
+Código do erro: 25 (ErpError.SALDO_INSUFICIENTE)
+
+Solução: Tente criar uma nova produção
+ou aborte a operação para poder iniciar uma nova.
+
+Exibir detalhes
+
+
+
+
+
+Ok",Almox Mont Carretas - Almoxarifado Montagem Carretas
+03/12/2024,026657,S Usinagem,27,ok,
+03/12/2024,026808,S Usinagem,24,ok,Almox Usinagem - Almoxarifado Usinagem
+03/12/2024,029221,S Usinagem,23,"Erro
+Saldo insuficiente neste apontamento.
+Erro: Saldo insuficiente (-18,000), Recurso: ""029221 - ENCAIXE MENOR DO DISCO - APOIO REGULADOR DO DISCO - PRÉ-ENCANTEIRADOR (60214618)"", Depósito: ""Almox Serra (872893)"", Lote: """", Lote ativo: """", Etapa: ""60214619"", Data: ""07/12/2024.
+Código do erro: 25 (ErpError.SALDO_INSUFICIENTE)
+
+Solução: Tente criar uma nova produção
+ou aborte a operação para poder iniciar uma nova.
+
+Exibir detalhes
+
+
+
+
+
+Ok",Almox Usinagem - Almoxarifado Usinagem
+03/12/2024,035713,S Usinagem,23,"Erro
+Saldo insuficiente neste apontamento.
+Erro: Saldo insuficiente (-23,000), Recurso: ""035713 - PARAFUSO LAMINA METISA [ROCAX1800] (89652416)"", Depósito: ""Almox Forjaria (138590)"", Lote: """", Lote ativo: """", Etapa: ""89057901"", Data: ""03/12/2024.
+Código do erro: 25 (ErpError.SALDO_INSUFICIENTE)
+
+Solução: Tente criar uma nova produção
+ou aborte a operação para poder iniciar uma nova.
+
+Exibir detalhes
+
+
+
+
+
+Ok",Almox Usinagem - Almoxarifado Usinagem
+03/12/2024,026653,S Usinagem,18,ok,Almox Usinagem - Almoxarifado Usinagem
+03/12/2024,429727,S Usinagem,15,ok,Almox Usinagem - Almoxarifado Usinagem
+03/12/2024,439666,S Usinagem,15,ok,Almox Usinagem - Almoxarifado Usinagem
+03/12/2024,026650,S Usinagem,12,ok,Almox Usinagem - Almoxarifado Usinagem
+03/12/2024,035636,S Usinagem,12,"Erro
+Saldo insuficiente neste apontamento.
+Erro: Saldo insuficiente (-6,000), Recurso: ""035636 - FLANGE DO DISCO [ETR6000 M24] (89071523)"", Depósito: ""Almox Usinagem (138591)"", Lote: """", Lote ativo: """", Etapa: ""89071524"", Data: ""03/12/2024.
+Código do erro: 25 (ErpError.SALDO_INSUFICIENTE)
+
+Solução: Tente criar uma nova produção
+ou aborte a operação para poder iniciar uma nova.
+
+Exibir detalhes
+
+
+
+
+
+Ok",Almox Prod Especiais - Almox Produtos Especiais
+03/12/2024,026864,S Usinagem,12,ok,Almox Usinagem - Almoxarifado Usinagem
+03/12/2024,026782,S Usinagem,9,ok,Almox Usinagem - Almoxarifado Usinagem
+03/12/2024,026786,S Usinagem,9,ok,Almox Usinagem - Almoxarifado Usinagem
+03/12/2024,010376,S Usinagem,8,ok,
+03/12/2024,026815,S Usinagem,6,ok,Almox Usinagem - Almoxarifado Usinagem
+03/12/2024,026722,S Usinagem,6,ok,Almox Usinagem - Almoxarifado Usinagem
+03/12/2024,474319,S Usinagem,6,ok,Almox Usinagem - Almoxarifado Usinagem
+03/12/2024,026729,S Usinagem,6,"Erro
+Saldo insuficiente neste apontamento.
+Erro: Saldo insuficiente (-6,000), Recurso: ""026729 - TUBO CURVADO - PROTETOR SOLAR - APLICADOR DE TNT (60318502)"", Depósito: ""Almox Corte e Estamparia (138589)"", Lote: """", Lote ativo: """", Etapa: ""60318510"", Data: ""03/12/2024.
+Código do erro: 25 (ErpError.SALDO_INSUFICIENTE)
+
+Solução: Tente criar uma nova produção
+ou aborte a operação para poder iniciar uma nova.
+
+Exibir detalhes
+
+
+
+
+
+Ok",Almox Usinagem - Almoxarifado Usinagem
+03/12/2024,026928,S Usinagem,6,ok,Almox Usinagem - Almoxarifado Usinagem
+03/12/2024,026875,S Usinagem,4,ok,Almox Usinagem - Almoxarifado Usinagem
+03/12/2024,415182,S Usinagem,4,"Erro
+Saldo insuficiente neste apontamento.
+Erro: Saldo insuficiente (-4,000), Recurso: ""415182 - TARUGO COROA 28D-CX T FOR RP (7653)"", Depósito: ""Almox Usinagem (138591)"", Lote: """", Lote ativo: """", Etapa: ""163778"", Data: ""03/12/2024.
+Código do erro: 25 (ErpError.SALDO_INSUFICIENTE)
+
+Solução: Tente criar uma nova produção
+ou aborte a operação para poder iniciar uma nova.
+
+Exibir detalhes
+
+
+
+
+
+Ok",Almox Mont Rotativas - Almox Montagem Rotativas
+03/12/2024,026876,S Usinagem,3,"Erro
+Saldo insuficiente neste apontamento.
+Erro: Saldo insuficiente (-2,000), Recurso: ""026876 - PINO 2º PONTO - PRÉ-ENCANTEIRADOR (60214647)"", Depósito: ""Almox Serra (872893)"", Lote: """", Lote ativo: """", Etapa: ""60214648"", Data: ""03/12/2024.
+Código do erro: 25 (ErpError.SALDO_INSUFICIENTE)
+
+Solução: Tente criar uma nova produção
+ou aborte a operação para poder iniciar uma nova.
+
+Exibir detalhes
+
+
+
+
+
+Ok",Almox Usinagem - Almoxarifado Usinagem
+03/12/2024,029766,S Usinagem,3,ok,
+03/12/2024,444224,S Usinagem,2,ok,Almox Usinagem - Almoxarifado Usinagem
+03/12/2024,423683,S Usinagem,2,ok,Almox Prod Especiais - Almox Produtos Especiais
+03/12/2024,035528,S Usinagem,2,ok,
