@@ -7,10 +7,16 @@ from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 
 import time
+import re
 import pandas as pd
 import requests
+import datetime
+from io import StringIO
+from utils import dados_planilha
 
 from verificar_chrome import *
 
@@ -158,6 +164,26 @@ def listar(nav, classe):
 
     return (lista_menu, test_lista)
 
+def data_hoje():
+    data_hoje = datetime.datetime.now()
+    ts = pd.Timestamp(data_hoje)
+    data_hoje = data_hoje.strftime('%d/%m/%Y')
+    
+    return(data_hoje)
+
+def hora_atual():
+    hora_atual = datetime.datetime.now()
+    ts = pd.Timestamp(hora_atual)
+    hora_atual = hora_atual.strftime('%H:%M:%S')
+    
+    return(hora_atual)
+
+def aguardando_requisicao_google_sheets(segundos):
+
+    for i in range(segundos,-1,-1):
+        time.sleep(1)
+        print(f"Aguardando {i} segundos para fazer uma nova chamada a API do google")
+
 def mudar_visao(nav):
 
     # Usar a função para clicar no botão "postButton"
@@ -247,37 +273,101 @@ def carregamento(nav):
                 # Se o elemento não for encontrado, interrompa o loop
                 break
     except TimeoutException:
+        pass 
+    
+    print('procurando carregamento 5')
+    try:
+        # Espera inicial para verificar se a mensagem de carregamento existe
+        carregamento = WebDriverWait(nav, 3).until(EC.presence_of_element_located((By.XPATH, '//*[@id="content_statusMessageBox"]')))
+        
+        # Enquanto o elemento existir, continue verificando
+        while True:
+            print("Carregando...")
+            try:
+                # Aguarde novamente pela presença do elemento
+                carregamento = WebDriverWait(nav, 3).until(EC.presence_of_element_located((By.XPATH, '//*[@id="content_statusMessageBox"]')))
+            except TimeoutException:
+                # Se o elemento não for encontrado, interrompa o loop
+                break
+    except TimeoutException:
         # Não há mensagem de carregamento inicial
         iframes(nav)
-        pass 
-
-    iframes(nav)
+        pass
 
 def verificar_se_erro(nav):
 
     nav.switch_to.default_content()
 
-    time.sleep(3)
+    time.sleep(2)
 
     error=None
     try:
-        error = WebDriverWait(nav, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="errorMessageBox"]')))
+        error = WebDriverWait(nav, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="errorMessageBox"]/div[2]/table/tbody/tr[1]/td[2]/div/div/span[1]'))).text
         confirm_button = WebDriverWait(nav, 10).until(EC.presence_of_element_located((By.XPATH, "//button[@id='confirm']")))
-        time.sleep(2)
+        time.sleep(1)
         confirm_button.click()
-        time.sleep(2)
+        time.sleep(1)
     # WebDriverWait(nav, 1).until(EC.element_to_be_clickable((
     #     By.XPATH, "//span[contains(@onclick, 'Environment.getInstance().closeTab')]/div"))).click()
     except:
-        return error
+        pass
+
+    if error == None:
+        try:
+            error = WebDriverWait(nav, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="errorMessageBox"]/div[2]/table/tbody/tr[1]/td[2]/div'))).text
+            confirm_button = WebDriverWait(nav, 10).until(EC.presence_of_element_located((By.XPATH, "//button[@id='confirm']")))
+            time.sleep(1)
+            confirm_button.click()
+            time.sleep(1)
+        except:
+            pass
 
     return error
+
+def exibindo_erro_na_planilha(nav,wks,row,erro,coluna_erro):
+
+    wks.update_acell(coluna_erro + str(row['index'] + 1), erro)
+    print("Saindo da aba")
+    WebDriverWait(nav, 1).until(EC.element_to_be_clickable((
+        By.XPATH, "//span[contains(@onclick, 'Environment.getInstance().closeTab')]/div"))).click()
+    time.sleep(1.5)
+    clicando_producao_menu_aberto(nav)
+
+def sair_da_aba_e_voltar_ao_menu(nav):
+    nav.switch_to.default_content()
+
+    WebDriverWait(nav, 1).until(EC.element_to_be_clickable((
+        By.XPATH, "//span[contains(@onclick, 'Environment.getInstance().closeTab')]/div"))).click()
+    time.sleep(1.5)
+    clicando_producao_menu_aberto(nav)
+
+def erro_na_data(nav,wks,row,erro):
+
+    wks.update_acell('F'+ str(row['index'] + 1), erro)
+
+    verificar_se_erro(nav)
+
+    iframes(nav)
+
+    data_input = WebDriverWait(nav, 10).until(EC.element_to_be_clickable((
+        By.XPATH, '//*[@id="producoes"]//input[@name="DATA"]')))
+    data_input.send_keys(Keys.CONTROL + 'A')
+    time.sleep(1.5)
+    data_input.send_keys(Keys.BACKSPACE)
+    time.sleep(1.5)
+    data_input.send_keys(Keys.TAB)
+    time.sleep(1.5)
+    nav.switch_to.default_content()
+    WebDriverWait(nav, 1).until(EC.element_to_be_clickable((
+        By.XPATH, "//span[contains(@onclick, 'Environment.getInstance().closeTab')]/div"))).click()
+    time.sleep(1.5)
+    clicando_producao_menu_aberto(nav)
 
 def clicar_em_add(nav):
     # Usar a função para clicar no botão "postButton"
     xpath_botao = '//*[@id="producoes"]//div[@id="insertButton"]'
     classe_esperada = "grid-titleBar-button grid-titleBar-newRecordButton-inactive"
-
+    print("add")
     clicar_ate_classe(nav, xpath_botao, classe_esperada)
 
 def preencher_classe(nav):
@@ -292,7 +382,7 @@ def preencher_classe(nav):
     time.sleep(1.5)
     classe_input.send_keys(Keys.TAB)
 
-def preencher_data_apontamento(nav):
+def preencher_data_apontamento(nav,data):
     
     iframes(nav)
 
@@ -300,23 +390,30 @@ def preencher_data_apontamento(nav):
         By.XPATH, '//*[@id="producoes"]//input[@name="DATA"]')))
     data_input.send_keys(Keys.CONTROL + 'A')
     time.sleep(1.5)
-    data_input.send_keys('03/12/2024')
+    data_input.send_keys(data)
     time.sleep(1.5)
     data_input.send_keys(Keys.TAB)
 
-def preencher_pessoa(nav):
+def preencher_pessoa(nav, apontamento_atual,funcionario=""):
 
     iframes(nav)
+
+    apontado_pelo_supervisor = ["serra", "usinagem"]
+
+    matricula_funcionario = "4054" if funcionario == "" else funcionario
+
+    if apontamento_atual in apontado_pelo_supervisor:
+        matricula_funcionario = "4057"
 
     pessoa_input = WebDriverWait(nav, 10).until(EC.element_to_be_clickable((
         By.XPATH, '//*[@id="producoes"]//input[@name="PESSOA"]')))
     pessoa_input.send_keys(Keys.CONTROL + 'A')
     time.sleep(1.5)
-    pessoa_input.send_keys('4054')
+    pessoa_input.send_keys(matricula_funcionario)
     time.sleep(1.5)
     pessoa_input.send_keys(Keys.TAB)
 
-def preencher_recurso(nav):
+def preencher_recurso(nav, codigo):
 
     iframes(nav)
 
@@ -324,11 +421,11 @@ def preencher_recurso(nav):
         By.XPATH, '//*[@id="producoes"]//input[@name="RECURSO"]')))
     recurso_input.send_keys(Keys.CONTROL + 'A')
     time.sleep(1.5)
-    recurso_input.send_keys('013213')
+    recurso_input.send_keys(codigo)
     time.sleep(1.5)
     recurso_input.send_keys(Keys.TAB)
 
-def preencher_processo(nav):
+def preencher_processo(nav, processo):
 
     error = None
 
@@ -338,31 +435,31 @@ def preencher_processo(nav):
         By.XPATH, '//*[@id="producoes"]//input[@name="PROCESSO"]')))
     processo_input.send_keys(Keys.CONTROL + 'A')
     time.sleep(1.5)
-    processo_input.send_keys('S Estamparia')
+    processo_input.send_keys(processo)
     time.sleep(1.5)
     processo_input.send_keys(Keys.TAB)
 
-    # Bloco de carregamento e erro 
-    carregamento(nav)
+    # # Bloco de carregamento e erro 
+    # carregamento(nav)
 
-    error=verificar_se_erro(nav)
+    # error=verificar_se_erro(nav)
 
-    # ser der erro, refaz o input
-    if error:
-        print('erro')
-        
-        time.sleep(3)
+    # # ser der erro, refaz o input
+    # if error:
+    #     iframes(nav)
 
-        processo_input = WebDriverWait(nav, 10).until(EC.element_to_be_clickable((
-            By.XPATH, '//*[@id="producoes"]//input[@name="PROCESSO"]')))
-        processo_input.send_keys(Keys.CONTROL + 'A')
-        time.sleep(1.5)
-        processo_input.send_keys('S Estamparia')
-        time.sleep(1.5)  
+    #     time.sleep(1.5)
 
-    return error         
+    #     processo_input = WebDriverWait(nav, 10).until(EC.element_to_be_clickable((
+    #         By.XPATH, '//*[@id="producoes"]//input[@name="PROCESSO"]')))
+    #     processo_input.send_keys(Keys.CONTROL + 'A')
+    #     time.sleep(1.5)
+    #     processo_input.send_keys(processo)
+    #     time.sleep(1.5)  
 
-def preecher_qtd_produzida(nav):
+    # return error         
+
+def preecher_qtd_produzida(nav, qt_produzida):
     
     iframes(nav)
     
@@ -370,7 +467,7 @@ def preecher_qtd_produzida(nav):
         By.XPATH, '//*[@id="producoes"]//input[@name="PRODUZIDO"]')))
     qt_input.send_keys(Keys.CONTROL + 'A')
     time.sleep(1.5)
-    qt_input.send_keys('1')
+    qt_input.send_keys(qt_produzida)
     time.sleep(1.5)
     qt_input.send_keys(Keys.TAB)
 
@@ -383,11 +480,11 @@ def preecher_qtd_produzida(nav):
         print('quantidade vazio')
         qt_input.send_keys(Keys.CONTROL + 'A')
         time.sleep(1.5)
-        qt_input.send_keys('1')
+        qt_input.send_keys(qt_produzida)
         time.sleep(1.5)
         qt_input.send_keys(Keys.TAB)
 
-def prencher_qtd_desviada(nav):
+def prencher_qtd_desviada(nav,qtd_desviada):
     
     iframes(nav)
     
@@ -395,7 +492,7 @@ def prencher_qtd_desviada(nav):
         By.XPATH, '//*[@id="producoes"]//input[@name="DESVIADO"]')))
     qt_input_desviado.send_keys(Keys.CONTROL + 'A')
     time.sleep(1.5)
-    qt_input_desviado.send_keys('1')
+    qt_input_desviado.send_keys(qtd_desviada)
     time.sleep(1.5)
     qt_input_desviado.send_keys(Keys.TAB)
 
@@ -404,11 +501,11 @@ def prencher_qtd_desviada(nav):
         EC.element_to_be_clickable((By.XPATH, '//*[@id="producoes"]//input[@name="DESVIADO"]'))
     ).get_attribute("value")
 
-    if qt_input_desviado == '':
+    if qt_input_desviado == '' and (qtd_desviada != "" or qtd_desviada == None):
         print('quantidade vazia')
         qt_input_desviado.send_keys(Keys.CONTROL + 'A')
         time.sleep(1.5)
-        qt_input_desviado.send_keys('1')
+        qt_input_desviado.send_keys(qtd_desviada)
         time.sleep(1.5)
         qt_input_desviado.send_keys(Keys.TAB)
     else:
@@ -422,142 +519,558 @@ def prencher_dep_destino(nav):
         By.XPATH, '//*[@id="producoes"]//input[@name="DEPOSITODESV"]')))
     dep_destino_input.send_keys(Keys.CONTROL + 'A')
     time.sleep(1.5)
-    dep_destino_input.send_keys('Almox Sucata')
+    dep_destino_input.send_keys('Almox Qualidade')
     time.sleep(1.5)
     dep_destino_input.send_keys(Keys.TAB)
 
-def preencher_cadastro(nav, dados):
+def preencher_cadastro(nav, dados, wks, apontamento_atual,dados_planilha):
     
     # buscar registro no google sheets
     try:
+
         actions = ActionChains(nav)
             
         iframes(nav)
 
-        mudar_visao(nav)
+        # Esse status serve para informar o status do ultimo apontamento, pois se tiver dado OK,
+        # não tem necessidade de mudar de visão
+        status = ""
 
-        #Clica em "Inserir"
-        iframes(nav)
-        
-        clicar_em_add(nav)
+        nomes_colunas = dados_planilha['nome_das_colunas']
+        processo = dados_planilha['processo']
 
-        carregamento(nav)
+        coluna_ok = dados_planilha['coluna_de_ok']
+        coluna_erro = dados_planilha['coluna_de_erro']
+    
+        if not dados.empty:
+            for _, row in dados.iterrows():
+                
+                iframes(nav)
 
-        # classe
-        try:
-            preencher_classe(nav)
-            error=verificar_se_erro(nav)
+                # ✅
+                print("INDEX")
+                print(row['index'])
+                planilha, wks = buscando_dados(dados_planilha, row['index'])
 
-            if error:
-                preencher_classe(nav)
-        except:
-            return f'Erro ao inputar classe'
+                # Identificar se preencheram o OK manualmente nessa linha
+                if planilha.empty:
+                    segundos = 60
+                    aguardando_requisicao_google_sheets(segundos)
+                    continue
+                
+                if status != "OK":
+                    mudar_visao(nav)
 
-        carregamento(nav)
+                status = ""
 
-        # data
-        try:
-            preencher_data_apontamento(nav)
-            error=verificar_se_erro(nav)
+                print(row)
 
-            if error:
-                print('erro')
-                preencher_data_apontamento(nav)
-        except:
-            return f'Erro ao inputar data'
-        
-        carregamento(nav)
+                try:
+                    clicar_em_add(nav)
+                except:
+                    sair_da_aba_e_voltar_ao_menu(nav)
+                    continue
 
-        # pessoa
-        try:
-            preencher_pessoa(nav)
-            error=verificar_se_erro(nav)
+                # carregamento(nav)
 
-            if error:
-                print('erro')
-                preencher_pessoa(nav)
-        except:
-            return f'Erro ao inputar pessoa'
+                # classe
+                try:
+                    preencher_classe(nav)
+                    error=verificar_se_erro(nav)
 
-        carregamento(nav)
+                    if error:
+                        preencher_classe(nav)
+                except:
+                    sair_da_aba_e_voltar_ao_menu(nav)
+                    continue
 
-        #recurso
-        try:
-            error=preencher_recurso(nav)
+                # carregamento(nav)
 
-            if error:
-                print('erro')
-                preencher_recurso(nav)
-        except:
-            return f'Erro ao inputar recurso'
+                # data
+                print("data")
+                try:
+                    preencher_data_apontamento(nav,row[nomes_colunas['data']])
+                    error=verificar_se_erro(nav)
 
-        carregamento(nav)
+                    if error:
+                        print('erro',error)
+                        erro_na_data(nav,wks,row,error)
+                        continue
+                except:
+                    sair_da_aba_e_voltar_ao_menu(nav)
+                    continue
+                
+                # carregamento(nav)
 
-        #processo
-        try:
-            preencher_processo(nav)
-            error=verificar_se_erro(nav)
+                # pessoa
+                print("pessoa")
+                try:
+                    if nomes_colunas['funcionário'] in row:
+                        preencher_pessoa(nav, apontamento_atual,row[nomes_colunas['funcionário']])
+                    else:
+                        preencher_pessoa(nav, apontamento_atual)
 
-            if error:
-                print('erro')
-        except:
-            return f'Erro ao inputar processo'
+                    error=verificar_se_erro(nav)
 
-        carregamento(nav)
+                    if error:
+                        print('erro')
+                except:
+                    sair_da_aba_e_voltar_ao_menu(nav)
+                    continue
 
-        #qt produzido
-        try:
-            preecher_qtd_produzida(nav)
-        except:
-            return f'Erro ao inputar qt produzida'
+                # carregamento(nav)
 
-        carregamento(nav)
+                #recurso
+                print("recurso")
+                try:
+                    preencher_recurso(nav,row[nomes_colunas['codigo']])
+                    error=verificar_se_erro(nav)
 
-        # se tiver desvio
-            # try:
-            #     prencher_qtd_desviada(nav)
-                # error=verificar_se_erro(nav)
+                    if error:
+                        exibindo_erro_na_planilha(nav,wks,row,error,coluna_erro)
+                        continue
+                except:
+                    sair_da_aba_e_voltar_ao_menu(nav)
+                    continue
 
-                # if error:
-                #     print('erro')
-            # except:
-            #     return f'Erro ao preencher desvio'
-            
-            # carregamento(nav)
+                # carregamento(nav)
 
-            # try:
-            #     prencher_dep_destino(nav)
-                # error=verificar_se_erro(nav)
+                #processo
+                print("processo")
+                try:
+                    preencher_processo(nav,processo)
+                    
+                    error=verificar_se_erro(nav)
 
-                # if error:
-                #     print('erro')
-            # except:
-            #     return f'Erro ao preencher dep destino'
+                    print('error')
+                    print(error)
 
-        #insert
-        iframes(nav)
-        # Usar a função para clicar no botão "postButton" (botão de confirmar)
-        btn = WebDriverWait(nav, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="producoes"]//div[@id="postButton"]')))
-        actions.move_to_element(btn).click().perform()
-        btn = WebDriverWait(nav, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="producoes"]//div[@id="postButton"]')))
-        actions.move_to_element(btn).click().perform()
+                    if error:
+                        exibindo_erro_na_planilha(nav,wks,row,error,coluna_erro)
+                        continue
+                except:
+                    sair_da_aba_e_voltar_ao_menu(nav)
+                    continue
 
-        carregamento(nav)
+                # carregamento(nav)
 
-        # verifica erro se der erro fecha a página e recomeça se não apenas aperta em add:
-        erro = verificar_se_erro(nav)
-        if erro:
-            WebDriverWait(nav, 1).until(EC.element_to_be_clickable((
-                By.XPATH, "//span[contains(@onclick, 'Environment.getInstance().closeTab')]/div"))).click()
-            time.sleep(1.5)
-            clicando_producao_menu_aberto(nav)
+                #qt produzido
+                print("qt produzido")
+                try:
+                    preecher_qtd_produzida(nav, row[nomes_colunas['quantidade']])
+                except:
+                    sair_da_aba_e_voltar_ao_menu(nav)
+                    continue
+
+                carregamento(nav)
+
+                # se tiver desvio
+                try:
+                    if nomes_colunas['mortas'] in row:
+                        prencher_qtd_desviada(nav,row[nomes_colunas['mortas']])
+                        error=verificar_se_erro(nav)
+
+                        if error:
+                            print('erro')
+                except:
+                    sair_da_aba_e_voltar_ao_menu(nav)
+                    continue
+                
+                carregamento(nav)
+
+                try:
+                    prencher_dep_destino(nav)
+                    error=verificar_se_erro(nav)
+
+                    if error:
+                        print('erro')
+                except:
+                    return f'Erro ao preencher dep destino'
+
+                #insert
+                iframes(nav)
+                # Usar a função para clicar no botão "postButton" (botão de confirmar)
+                btn = WebDriverWait(nav, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="producoes"]//div[@id="postButton"]')))
+                actions.move_to_element(btn).click().perform()
+                btn = WebDriverWait(nav, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="producoes"]//div[@id="postButton"]')))
+                actions.move_to_element(btn).click().perform()
+
+                print("postButton")
+
+                carregamento(nav)
+
+                # message_errorToHtml
+                erro = verificar_se_erro(nav)
+
+                if apontamento_atual == 'corte':
+                    try:
+                        erro = preencher_processo_corte(nav, row, erro)
+                    except:
+                        sair_da_aba_e_voltar_ao_menu(nav)
+                        continue
+                elif apontamento_atual == 'pintura':
+                    try:
+                        erro = preencher_processo_pintura(nav, row)
+                    except:
+                        sair_da_aba_e_voltar_ao_menu(nav)
+                        continue
+
+                if erro:
+                    print(erro)
+                    exibindo_erro_na_planilha(nav,wks,row,erro,coluna_erro)
+                    carregamento(nav)
+                else:
+                    iframes(nav)
+                    clicar_em_add(nav)
+                    carregamento(nav)
+                    print('OK')
+                    status = 'OK'
+                    wks.update_acell(coluna_ok + str(row['index'] + 1), f'OK {data_hoje()} {hora_atual()}')
+
         else:
-            voltar_visao(nav)
+            return "Sem dados para apontar"
     except:
-        return 'Erro ao iniciar'
+        return f"Erro inesperado ao apontar o {apontamento_atual}, reiniciando processo de apontamento"
 
-    return 'ok'
+    return "Sem dados para apontar"
 
+def preencher_processo_corte(nav, row, erro):
+
+    dados_espessura_chapa = leitura_google_planilhas_apoio_chapas()
+
+    iframes(nav)
+
+    recurso_movimento_deposito = WebDriverWait(nav, 10).until(EC.element_to_be_clickable((
+        By.XPATH, '//*[@id="0"]/td[9]/div/div'))).text
+    chapa_atual = str(recurso_movimento_deposito).split('-')[0].strip() if '-' in str(recurso_movimento_deposito) else str(recurso_movimento_deposito)
+    peso_antigo_webdrive = WebDriverWait(nav, 10).until(EC.element_to_be_clickable((
+        By.XPATH, '//*[@id="0"]/td[26]/div/div')))
+    peso_antigo = float(peso_antigo_webdrive.text)
+    espessura_antiga = float(dados_espessura_chapa[dados_espessura_chapa['CODIGO'] == chapa_atual].ESPESSURA.values[0].replace(" mm","").replace(",","."))
+    print("Peso Antigo")
+    print(peso_antigo)
+    print("Espessura Antiga")
+    print(espessura_antiga)
+
+    chapa = row['Código Chapa']
+    #teste
+    espessura_str = row['Espessura'] # 'MS 2,00 mm'
+    espessura_nova = float(re.search(r'\d+,\d+', espessura_str).group().replace(',', '.'))
+
+    print("Espessura Nova")
+    print(espessura_nova)
+
+    if chapa_atual == chapa: 
+        print('Chapa igual, não precisa fazer nada')
+        nav.switch_to.default_content()
+        return erro
+    else:
+        WebDriverWait(nav, 10).until(EC.element_to_be_clickable((
+            By.XPATH, '//*[@id="0"]/td[9]/div/div'))).click()
+        time.sleep(0.5)
+        WebDriverWait(nav, 10).until(EC.element_to_be_clickable((
+            By.XPATH, '//*[@id="0"]/td[9]/div/input'))).send_keys(chapa)
+        time.sleep(0.5)
+
+        WebDriverWait(nav, 10).until(EC.element_to_be_clickable((
+            By.XPATH, '//*[@id="0"]/td[9]/div/input'))).send_keys(Keys.TAB)
+        time.sleep(0.5)
+
+        carregamento(nav)
+    
+        WebDriverWait(nav, 10).until(EC.element_to_be_clickable((
+            By.XPATH, '//*[@id="0"]/td[11]/div/input'))).send_keys(chapa_atual)
+        time.sleep(0.5)
+
+        WebDriverWait(nav, 10).until(EC.element_to_be_clickable((
+            By.XPATH, '//*[@id="0"]/td[11]/div/input'))).send_keys(Keys.TAB)
+        time.sleep(0.5)
+
+        carregamento(nav)
+
+        peso_antigo_webdrive.click()
+
+        quantidade_movimentacao_deposito = WebDriverWait(nav, 10).until(EC.element_to_be_clickable((
+            By.XPATH, '/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[3]/td[26]/div/input')))
+        
+        quantidade_movimentacao_deposito.send_keys(Keys.CONTROL + 'A')
+        
+        quantidade_movimentacao_deposito.send_keys((peso_antigo/espessura_antiga) * espessura_nova)
+
+        carregamento(nav)
+
+        quantidade_movimentacao_deposito.send_keys(Keys.TAB)
+        
+        carregamento(nav)
+
+        WebDriverWait(nav, 10).until(EC.element_to_be_clickable((By.XPATH, '/html/body/table/tbody/tr[2]/td/div/form/table/thead/tr[1]/td[1]/table/tbody/tr/td[2]/table/tbody/tr/td[4]/div'))).click()
+        time.sleep(0.5)
+
+        carregamento(nav)
+
+        WebDriverWait(nav, 10).until(EC.element_to_be_clickable((By.XPATH, '/html/body/table/tbody/tr[1]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr/td/table/tbody/tr[1]/td[2]/table/tbody/tr/td[1]/input'))).click()
+        time.sleep(1)
+
+        WebDriverWait(nav, 10).until(EC.element_to_be_clickable((By.XPATH, '/html/body/table/tbody/tr[1]/td/div/form/table/thead/tr[1]/td[1]/table/tbody/tr/td[2]/table/tbody/tr/td[4]/div'))).click()
+        time.sleep(1)
+
+        carregamento(nav)
+
+        erro = verificar_se_erro(nav)
+
+        if erro:
+            # Erro ao mudar a chapa, foi apontado porém não mudou a chapa
+            print(erro)    
+            carregamento(nav)
+            WebDriverWait(nav, 10).until(EC.element_to_be_clickable((By.XPATH, '/html/body/table/tbody/tr[1]/td/div/form/table/thead/tr[1]/td[1]/table/tbody/tr/td[2]/table/tbody/tr/td[5]/div'))).click()
+            carregamento(nav)
+            nav.switch_to.default_content()
+            WebDriverWait(nav, 10).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="answers_0"]'))).click()
+            time.sleep(1)
+            nav.switch_to.default_content()
+
+    return erro
+
+def preencher_processo_pintura(nav, row):
+    
+    iframes(nav)
+    table_prod = WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="movDeposConsumidos"]/tbody/tr[1]/td[1]/table')))
+
+    table_html_prod = table_prod.get_attribute('outerHTML')
+        
+    time.sleep(2)
+    
+    tabelona = None
+
+    tabelona = pd.read_html(StringIO(table_html_prod), header=None)
+    tabelona = tabelona[0].iloc[1:]
+
+    # headers = tabelona.iloc[:1]
+    # tabelona = tabelona.set_axis(headers.values.tolist()[0],axis='columns')[1:]
+
+    tabelona = tabelona.rename(columns={11:'Recurso',30:'Quantidade'})
+
+    tabelona = tabelona.dropna(subset='Recurso')
+    
+    tabelona = tabelona.reset_index(drop=True)
+    
+    tabelona['localizacao_tabela'] = range(3, 3 + 2 * len(tabelona), 2)
+
+    print(tabelona)
+
+    quantidade_po = None
+    localizacao_po = None
+    quantidade_catalisador = None
+    localizacao_catalisador = None
+    codigo_antigo = None
+    quantidade_pu = None
+    localizacao_pu = None
+    cor_antiga = None
+    tipo_tinta = row['Tipo']
+    cor = row['Cor']
+
+    df_cores = pd.read_excel("tintas.xlsx")
+
+    print(df_cores)
+
+    codigo = df_cores[(df_cores['COR_SIGLA'] == cor) & (df_cores['TIPO'] == tipo_tinta)]['CODIGO'].values[0]
+
+    try:
+        quantidade_catalisador = pd.to_numeric(tabelona[tabelona['Recurso'].str.contains('CATA')]['Quantidade']).values[0]
+        localizacao_catalisador = tabelona[tabelona['Recurso'].str.contains('CATA')]['localizacao_tabela'].values[0]
+    except:
+        pass
+
+    try:
+        quantidade_pu = pd.to_numeric(tabelona[tabelona['Recurso'].str.contains('ESM. PU')]['Quantidade']).values[0]
+        localizacao_pu = tabelona[tabelona['Recurso'].str.contains('ESM. PU')]['localizacao_tabela'].values[0]
+        cor_antiga = tabelona[tabelona['Recurso'].str.contains('ESM. PU')]['Recurso'].values[0].split(' ')[0]
+    except:
+        pass
+
+    try:
+        quantidade_po = pd.to_numeric(tabelona[tabelona['Recurso'].str.contains('TINTA PÓ')]['Quantidade']).values[0]
+        localizacao_po = tabelona[tabelona['Recurso'].str.contains('TINTA PÓ')]['localizacao_tabela'].values[0]
+        codigo_antigo = tabelona[tabelona['Recurso'].str.contains('TINTA PÓ')]['Recurso'].values[0].split(' - ')[0]
+        cor_antiga = tabelona[tabelona['Recurso'].str.contains('TINTA PÓ')]['Recurso'].values[0].split(' ')[0]
+    except:
+        pass
+
+    linha_maxima = tabelona['localizacao_tabela'].max()
+    print(codigo_antigo)
+    if tipo_tinta == 'PU':
+
+        # verificando se contem catalisador
+        if len(tabelona[tabelona['Recurso'].str.contains('CATA')]) == 1:
+            iframes(nav)
+            WebDriverWait(nav, 10).until(EC.element_to_be_clickable((By.XPATH, '/html/body/table/tbody/tr[1]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr/td/table/tbody/tr[1]/td[2]/table/tbody/tr/td[1]/input'))).click()
+            carregamento(nav)
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, '/html/body/table/tbody/tr[1]/td/div/form/table/thead/tr[1]/td[1]/table/tbody/tr/td[2]/table/tbody/tr/td[4]/div'))).click()
+            carregamento(nav)
+            erro = verificar_se_erro(nav)
+
+        else:
+            calculo_pu = quantidade_po * 1.58
+            calculo_catalisador = calculo_pu / 6
+            
+            time.sleep(.5)
+            # clicar em insert
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, '/html/body/table/tbody/tr[2]/td/div/form/table/thead/tr[1]/td[1]/table/tbody/tr/td[2]/table/tbody/tr/td[2]/div'))).click()
+            
+            time.sleep(.5)
+            # clicando em deposito
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[7]/div'))).click()
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[7]/div/input'))).send_keys("Pintura")
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[7]/div/input'))).send_keys(Keys.TAB)
+
+            time.sleep(.5)
+            # inputando recurso Cor
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[9]/div/input'))).send_keys(str(codigo))
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[9]/div/input'))).send_keys(Keys.TAB)
+
+            time.sleep(.5)
+
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[11]/div/input'))).send_keys(str(codigo_antigo))
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[11]/div/input'))).send_keys(Keys.TAB)
+            
+            time.sleep(.5)
+
+            # inputando quantidade
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[26]/div'))).click()
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[26]/div/input'))).send_keys(calculo_pu)
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[26]/div/input'))).send_keys(Keys.TAB)
+
+            time.sleep(.5)
+            # insert
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'//*[@id="movDeposConsumidos"]/thead/tr[1]/td[1]/table/tbody/tr/td[2]/table/tbody/tr/td[4]'))).click()
+                
+            ######### CATALISADOR #########            
+            
+            time.sleep(.5)
+            # clicar em insert
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, '/html/body/table/tbody/tr[2]/td/div/form/table/thead/tr[1]/td[1]/table/tbody/tr/td[2]/table/tbody/tr/td[2]/div'))).click()
+
+            carregamento(nav)
+            print(f"linha_maxima {linha_maxima + 2}")
+            print(f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[7]/div/div')
+            # clicando em deposito
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[7]/div/div'))).click()
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[7]/div/input'))).send_keys("Pintura")
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[7]/div/input'))).send_keys(Keys.TAB)
+
+            time.sleep(.5)
+            # inputando recurso Catalisador 
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[9]/div/input'))).send_keys('313210')
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[9]/div/input'))).send_keys(Keys.TAB)
+
+            time.sleep(.5)
+            # inputando quantidade
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[26]/div'))).click()
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[26]/div/input'))).send_keys(calculo_catalisador)
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[26]/div/input'))).send_keys(Keys.TAB)
+
+            time.sleep(.5)
+            # insert
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'//*[@id="movDeposConsumidos"]/thead/tr[1]/td[1]/table/tbody/tr/td[2]/table/tbody/tr/td[4]'))).click()
+
+            carregamento(nav)
+
+            print(localizacao_po - 2)
+
+            # selecionando po
+            WebDriverWait(nav, 1).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{localizacao_po - 2}]/td[1]/input'))).click()
+
+            time.sleep(.5)
+            # apagando po
+            WebDriverWait(nav, 10).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="movDeposConsumidos"]/thead/tr[1]/td[1]/table/tbody/tr/td[2]/table/tbody/tr/td[3]'))).click()
+
+            nav.switch_to.default_content()
+            WebDriverWait(nav, 10).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[8]/table/tbody/tr/td[2]/div/div[2]'))).click()
+
+            carregamento(nav)
+
+            time.sleep(.5)
+            #confirmando tabela de cima
+            iframes(nav)
+            WebDriverWait(nav, 1).until(EC.element_to_be_clickable((By.XPATH, '/html/body/table/tbody/tr[1]/td/div/form/table/thead/tr[1]/td[1]/table/tbody/tr/td[2]/table/tbody/tr/td[4]/div'))).click()
+
+            carregamento(nav)
+
+            # verifica se deu erro
+            nav.switch_to.default_content()
+
+            erro = verificar_se_erro(nav)
+
+    elif tipo_tinta == 'PÓ':
+        
+        if len(tabelona[tabelona['Recurso'].str.contains('TINTA PÓ')]) == 1:
+            iframes(nav)
+            WebDriverWait(nav, 10).until(EC.element_to_be_clickable((By.XPATH, '/html/body/table/tbody/tr[1]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr/td/table/tbody/tr[1]/td[2]/table/tbody/tr/td[1]/input'))).click()
+            carregamento(nav)
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, '/html/body/table/tbody/tr[1]/td/div/form/table/thead/tr[1]/td[1]/table/tbody/tr/td[2]/table/tbody/tr/td[4]/div'))).click()
+            carregamento(nav)
+            erro = verificar_se_erro(nav)
+
+        else:
+            #calculando quantidade de po
+            calculo_po = quantidade_pu / 1.58
+
+            time.sleep(.5)
+            # clicar em insert
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, '/html/body/table/tbody/tr[2]/td/div/form/table/thead/tr[1]/td[1]/table/tbody/tr/td[2]/table/tbody/tr/td[2]/div'))).click()
+            
+            time.sleep(.5)
+            # clicando em deposito
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[7]/div'))).click()
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[7]/div/input'))).send_keys("Pintura")
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[7]/div/input'))).send_keys(Keys.TAB)
+
+            time.sleep(.5)
+            # inputando recurso
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[9]/div/input'))).send_keys(str(codigo))
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[9]/div/input'))).send_keys(Keys.TAB)
+
+            # inputando recurso substituido (codigo antigo)
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[11]/div/input'))).send_keys(cor_antiga)
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[11]/div/input'))).send_keys(Keys.TAB)
+
+            time.sleep(.5)
+            # inputando quantidade
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[26]/div'))).click()
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[26]/div/input'))).send_keys(calculo_po)
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima+2}]/td[26]/div/input'))).send_keys(Keys.TAB)
+
+
+            time.sleep(.5)
+            # insert
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'//*[@id="movDeposConsumidos"]/thead/tr[1]/td[1]/table/tbody/tr/td[2]/table/tbody/tr/td[4]'))).click()
+
+            time.sleep(.5)
+            # selecionando catalisador e pu
+            WebDriverWait(nav, 1).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{localizacao_pu}]/td[1]/input'))).click()
+            WebDriverWait(nav, 1).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{localizacao_catalisador}]/td[1]/input'))).click()
+            
+            time.sleep(.5)
+            # apagando
+            WebDriverWait(nav, 1).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="movDeposConsumidos"]/thead/tr[1]/td[1]/table/tbody/tr/td[2]/table/tbody/tr/td[3]'))).click()
+            
+            time.sleep(.5)
+            # confirmando
+            nav.switch_to.default_content()
+            WebDriverWait(nav, 1).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[8]/table/tbody/tr/td[2]/div/div[2]'))).click()
+
+            time.sleep(.5)
+            #confirmando tabela de cima
+            iframes(nav)
+            WebDriverWait(nav, 1).until(EC.element_to_be_clickable((By.XPATH, '/html/body/table/tbody/tr[1]/td/div/form/table/thead/tr[1]/td[1]/table/tbody/tr/td[2]/table/tbody/tr/td[4]/div'))).click()
+
+            time.sleep(.5)
+            # verifica se deu erro
+            nav.switch_to.default_content()
+
+            erro = verificar_se_erro(nav)
+
+    return erro
 def recomecar(nav):
 
     nav.switch_to.default_content()
@@ -602,22 +1115,72 @@ def clicar_ate_classe(nav, xpath, classe_esperada, max_tentativas=5, intervalo=2
     print("Falha ao encontrar a classe esperada.")
     return False
 
-chrome_driver_path = verificar_chrome_driver()
-nav = webdriver.Chrome(chrome_driver_path)
-nav.maximize_window()
-# nav.get("http://192.168.3.141/sistema")
-nav.get("https://hcemag.innovaro.com.br/sistema/")
+def leitura_google_planilhas(worksheet, key_sheets):
 
-login(nav)
+    scope = ['https://www.googleapis.com/auth/spreadsheets',
+                    "https://www.googleapis.com/auth/drive"]
 
-menu_apontamento(nav)
+    credentials = ServiceAccountCredentials.from_json_keyfile_name("service_account_cemag.json", scope)
+    client = gspread.authorize(credentials)
+    # Conectando com google sheets e acessando Análise Previsão de Consumo (CMM / NTP ) DEE
 
-def buscando_dados():
+    sh = client.open_by_key(key_sheets)
+    wks = sh.worksheet(worksheet)
 
-    dados = pd.read_csv("dados.csv", sep=',')
-    dados['codigo'] = dados['codigo'].apply(lambda x: "0" + str(x) if len(str(x)) == 5 else str(x) )
+    df = wks.get()
+
+    dados = pd.DataFrame(df)
+
+    return dados, wks
+
+def leitura_google_planilhas_apoio_chapas():
+
+    scope = ['https://www.googleapis.com/auth/spreadsheets',
+                    "https://www.googleapis.com/auth/drive"]
+
+    credentials = ServiceAccountCredentials.from_json_keyfile_name("service_account_cemag.json", scope)
+    client = gspread.authorize(credentials)
+    # Conectando com google sheets e acessando Análise Previsão de Consumo (CMM / NTP ) DEE
+
+    sh = client.open_by_key('1t7Q_gwGVAEwNlwgWpLRVy-QbQo7kQ_l6QTjFjBrbWxE')
+    wks = sh.worksheet('APOIO CHAPA')
+
+    df = wks.get()
+
+    base = pd.DataFrame(df)
+
+    headers = wks.row_values(4)[11:]
+
+    dados = base.iloc[4:, 11:13].set_axis(headers, axis=1)
 
     return dados
+
+def buscando_dados(dados_planilha, indice=None):
+    # Parâmetros: Nome da Aba e Chave da planilha
+    dados, wks = leitura_google_planilhas(dados_planilha['nome_aba'], dados_planilha['chave_planilha'])
+
+    nomes_colunas = dados_planilha['nome_das_colunas']
+
+    dados.columns = dados.iloc[0]
+    dados = dados[1:]  # Removendo a primeira linha agora que é o cabeçalho
+    dados.reset_index(drop=False, inplace=True)
+    dados[nomes_colunas['status_pcp']] = dados[nomes_colunas['status_pcp']].astype(str)
+
+    dados_filtrados = dados[(dados[nomes_colunas['status_pcp']] == 'None') | (dados[nomes_colunas['status_pcp']] == "")]
+
+    # Aplicar filtro de quantidade de linhas se num_linhas não for None
+    if indice is not None:
+        dados_filtrados = dados_filtrados[dados_filtrados['index'] == indice]
+
+
+    dados_filtrados[nomes_colunas['codigo']] = dados_filtrados[nomes_colunas['codigo']].apply(lambda x: "0" + str(x) if len(str(x)) == 5 else str(x))
+    dados_filtrados[nomes_colunas['status_pcp']] = dados_filtrados[nomes_colunas['status_pcp']].apply(lambda x: "" if str(x) == 'None' else "")
+    dados_filtrados[nomes_colunas['codigo']] = dados_filtrados[nomes_colunas['codigo']].apply(
+        lambda x: str(x).split('-')[0].strip() if '-' in str(x) else str(x)
+    )
+    print(dados_filtrados)
+
+    return dados_filtrados, wks
 
 def registrar_status(codigo,status):
 
@@ -638,7 +1201,38 @@ def registrar_status(codigo,status):
     else:
         print(f"Erro {response.status_code}: {response.text}")
 
-dados  = buscando_dados()
+status_execucao = ""
 
-status = preencher_cadastro(nav, dados)
+while True:
+    if status_execucao != "Sem dados para apontar":
+        try:
+            nav = webdriver.Chrome()
+        except:
+            chrome_driver_path = verificar_chrome_driver()
+            nav = webdriver.Chrome(chrome_driver_path)
 
+        nav.maximize_window()
+        # nav.get("http://192.168.3.141/sistema")
+        nav.get("https://hcemag.innovaro.com.br/sistema/")
+
+        login(nav)
+        
+        menu_apontamento(nav)
+    
+    try:
+
+        for apontamento_atual, value in dados_planilha.items():
+            
+            # apontamento_atual == nome do setor
+            # ✅
+            dados, wks = buscando_dados(value)
+
+            status_execucao = preencher_cadastro(nav, dados, wks, apontamento_atual,value)
+
+            if status_execucao == "Sem dados para apontar":
+                print("Sem dados para apontar")
+                segundos = 60
+                aguardando_requisicao_google_sheets(segundos)
+                continue
+    except:
+        continue
