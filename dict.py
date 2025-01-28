@@ -1,11 +1,12 @@
 
 dados_planilha = {
     # "corte": {
-    #     "nome_aba":"dados_corte",
-    #     "chave_planilha":"1_HYpW2HLXkUhKYYphBplWJPNOwpleg0fZbodnXI5LeE",
+    #     "nome_aba":"RQ PCP-004-000 (Apontamento Corte)",
+    #     "chave_planilha":"1t7Q_gwGVAEwNlwgWpLRVy-QbQo7kQ_l6QTjFjBrbWxE",
     #     "processo":"S",
     #     "coluna_de_ok": "M",
     #     "coluna_de_erro": "P",
+    #     "coluna_da_chave":"P",
     #     "nome_das_colunas": {
     #         "data": "Data finalização",
     #         "codigo": "Peça",
@@ -17,11 +18,12 @@ dados_planilha = {
     #     }
     # },
     # "estamparia":{
-    #     "nome_aba":"dados_estamparia",
-    #     "chave_planilha":"1_HYpW2HLXkUhKYYphBplWJPNOwpleg0fZbodnXI5LeE",
-    #     "processo":"S",
+    #     "nome_aba":"RQ PCP-007-000 (APONTAMENTO ESTAMPARIA)",
+    #     "chave_planilha":"1MvYWI6oUCRk1JVK5CsjkxjCHDxUCXz7hb7C2GHuIySw",
+    #     "processo":"S E",
     #     "coluna_de_ok": "L",
     #     "coluna_de_erro": "M",
+    #     "coluna_da_chave":"M",
     #     "nome_das_colunas": {
     #         "data": "DATA",
     #         "codigo": "CÓDIGO TRATADO",
@@ -30,13 +32,15 @@ dados_planilha = {
     #         "mortas":"Nº DE MORTAS",
     #         "status_pcp":"PCP",
     #         "erro":"OBSERVAÇÃO"
-    #     }
-    # },"serra": {
+    #     },
+    #  },
+    # "serra": {
     #     "nome_aba":"dados_serra",
     #     "chave_planilha":"1_HYpW2HLXkUhKYYphBplWJPNOwpleg0fZbodnXI5LeE",
     #     "processo":"S",
     #     "coluna_de_ok": "M",
     #     "coluna_de_erro": "O",
+    #     "coluna_da_chave":"O",
     #     "nome_das_colunas": {
     #         "data": "Data",
     #         "codigo": "Código",
@@ -44,7 +48,7 @@ dados_planilha = {
     #         "quantidade": "Produzido",
     #         "mortas":"Mortas",
     #         "status_pcp":"Status Apont.",
-    #         "erro":"Erro Robo"
+    #         "erro":"Erro Robo",
     #     }
     # },
     # "usinagem": {
@@ -53,6 +57,7 @@ dados_planilha = {
     #     "processo":"S Usinagem",
     #     "coluna_de_ok": "F",
     #     "coluna_de_erro": "G",
+    #     "coluna_da_chave":"G",
     #     "nome_das_colunas": {
     #         "data": "Data",
     #         "codigo": "Código da peça",
@@ -64,11 +69,12 @@ dados_planilha = {
     #     }
     # },
     # "montagem": {
-    #     "nome_aba":"dados_montagem",
-    #     "chave_planilha":"1_HYpW2HLXkUhKYYphBplWJPNOwpleg0fZbodnXI5LeE",
-    #     "processo":"S",
+    #     "nome_aba":"RQ PCP 002-000 (APONTAMENTO MONTAGEM)",
+    #     "chave_planilha":"1x26yfwoF7peeb59yJuJuxCQNlqjCjh65NYS1RIrC0Zc",
+    #     "processo":"S Mont",
     #     "coluna_de_ok": "J",
     #     "coluna_de_erro": "K",
+    #     "coluna_da_chave":"K",
     #     "nome_das_colunas": {
     #         "data": "Data de apontamento",
     #         "codigo": "Código",
@@ -80,11 +86,12 @@ dados_planilha = {
     #     }
     # },
     "pintura": {
-        "nome_aba":"dados_pintura",
-        "chave_planilha":"1_HYpW2HLXkUhKYYphBplWJPNOwpleg0fZbodnXI5LeE",
+        "nome_aba":"RQ PCP 015-000 (APONTAMENTO PINTURA)",
+        "chave_planilha":"180NO52JDMnoQ4COIipTDenkYTdz3f39PfBIcNYCKQLE",
         "processo":"S Pint",
         "coluna_de_ok": "J",
         "coluna_de_erro": "K",
+        "coluna_da_chave":"K",
         "nome_das_colunas": {
             "data": "Data de apontamento",
             "codigo": "Codificação",
@@ -94,7 +101,7 @@ dados_planilha = {
             "cor":"Cor",
             "tipo_tinta":"Tipo",
             "status_pcp":"PCP",
-            "erro":"Erro robô"
+            "erro":"Erro robô"   
         }
     }
 }
