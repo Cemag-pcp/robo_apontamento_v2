@@ -624,7 +624,7 @@ def preencher_processo_corte(nav, row, erro):
 
         erro = verificar_se_erro(nav)
 
-        if "O recurso substituído" in erro:
+        if erro and "O recurso substituído" in erro:
             iframes(nav)
             WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[3]/td[11]/div'))).click()
             time.sleep(2)
@@ -895,8 +895,8 @@ def preencher_processo_pintura(nav, row):
             carregamento(nav)
 
             erro = verificar_se_erro(nav)
-
-            if "O recurso substituído" in erro:
+            
+            if erro and "O recurso substituído" in erro:
                 iframes(nav)
                 WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima - 2}]/td[11]/div'))).click()
                 time.sleep(2)
