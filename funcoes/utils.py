@@ -396,7 +396,7 @@ def preencher_pessoa(nav, apontamento_atual,funcionario=""):
 
     iframes(nav)
 
-    apontado_pelo_supervisor = ["serra", "usinagem", "pintura", "estamparia", "montagem"]
+    apontado_pelo_supervisor = ["serra", "usinagem", "pintura", "estamparia", "montagem","corte"]
 
     matricula_funcionario = "4054" if funcionario == "" else funcionario
 
@@ -405,6 +405,8 @@ def preencher_pessoa(nav, apontamento_atual,funcionario=""):
             matricula_funcionario = "4359"
         elif apontamento_atual == "estamparia" or apontamento_atual == "montagem":
             matricula_funcionario = str(funcionario).split('-')[0].strip()
+        elif apontamento_atual == "corte":
+            matricula_funcionario = "4322"
         else:
             matricula_funcionario = "4057"
 
@@ -419,13 +421,14 @@ def preencher_pessoa(nav, apontamento_atual,funcionario=""):
 def preencher_recurso(nav, codigo):
 
     iframes(nav)
-
+    print("CÓDIGO")
+    print(codigo)
     recurso_input = WebDriverWait(nav, 10).until(EC.element_to_be_clickable((
         By.XPATH, '//*[@id="producoes"]//input[@name="RECURSO"]')))
     recurso_input.send_keys(Keys.CONTROL + 'A')
-    time.sleep(1.5)
+    time.sleep(.5)
     recurso_input.send_keys(codigo)
-    time.sleep(1.5)
+    time.sleep(3)
     recurso_input.send_keys(Keys.TAB)
 
 def preencher_processo(nav, processo):
@@ -490,7 +493,9 @@ def preecher_qtd_produzida(nav, qt_produzida):
 def prencher_qtd_desviada(nav,qtd_desviada):
     
     iframes(nav)
-    
+    if qtd_desviada == None:
+        qtd_desviada = ""
+
     qt_input_desviado = WebDriverWait(nav, 10).until(EC.element_to_be_clickable((
         By.XPATH, '//*[@id="producoes"]//input[@name="DESVIADO"]')))
     qt_input_desviado.send_keys(Keys.CONTROL + 'A')
@@ -530,6 +535,10 @@ def preencher_processo_corte(nav, row, erro):
 
     dados_espessura_chapa = leitura_google_planilhas_apoio_chapas()
 
+    chapa = row['Código Chapa']
+    if chapa == None:
+        chapa = ""
+
     iframes(nav)
 
     recurso_movimento_deposito = WebDriverWait(nav, 10).until(EC.element_to_be_clickable((
@@ -538,25 +547,32 @@ def preencher_processo_corte(nav, row, erro):
     peso_antigo_webdrive = WebDriverWait(nav, 10).until(EC.element_to_be_clickable((
         By.XPATH, '//*[@id="0"]/td[26]/div/div')))
     peso_antigo = float(peso_antigo_webdrive.text)
-    espessura_antiga = float(dados_espessura_chapa[dados_espessura_chapa['CODIGO'] == chapa_atual].ESPESSURA.values[0].replace(" mm","").replace(",","."))
+    try:
+        espessura_antiga = float(dados_espessura_chapa[dados_espessura_chapa['CODIGO'] == chapa_atual].ESPESSURA.values[0].replace(" mm","").replace(",","."))
+    except:
+        erro = f"A Chapa: {chapa_atual}, não foi encontrada na aba 'Apoio Chapa'"
+        nav.switch_to.default_content()
+        return erro
+    
     print("Peso Antigo")
     print(peso_antigo)
     print("Espessura Antiga")
     print(espessura_antiga)
 
-    chapa = row['Código Chapa']
-    #teste
-    espessura_str = row['Espessura'] # 'MS 2,00 mm'
-    espessura_nova = float(re.search(r'\d+,\d+', espessura_str).group().replace(',', '.'))
-
-    print("Espessura Nova")
-    print(espessura_nova)
-
-    if chapa_atual == chapa: 
+    if chapa_atual == chapa or chapa == "": 
         print('Chapa igual, não precisa fazer nada')
         nav.switch_to.default_content()
         return erro
     else:
+        try:
+            espessura_nova = float(dados_espessura_chapa[dados_espessura_chapa['CODIGO'] == chapa].ESPESSURA.values[0].replace(" mm","").replace(",","."))
+        except:
+            erro = f"A Chapa: {chapa}, não foi encontrada na aba 'Apoio Chapa'"
+            nav.switch_to.default_content()
+            return erro
+
+        print("Espessura Nova")
+        print(espessura_nova)
         WebDriverWait(nav, 10).until(EC.element_to_be_clickable((
             By.XPATH, '//*[@id="0"]/td[9]/div/div'))).click()
         time.sleep(0.5)
@@ -608,17 +624,31 @@ def preencher_processo_corte(nav, row, erro):
 
         erro = verificar_se_erro(nav)
 
-        if erro:
-            # Erro ao mudar a chapa, foi apontado porém não mudou a chapa
-            print(erro)    
-            carregamento(nav)
-            WebDriverWait(nav, 10).until(EC.element_to_be_clickable((By.XPATH, '/html/body/table/tbody/tr[1]/td/div/form/table/thead/tr[1]/td[1]/table/tbody/tr/td[2]/table/tbody/tr/td[5]/div'))).click()
-            carregamento(nav)
-            nav.switch_to.default_content()
-            WebDriverWait(nav, 10).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="answers_0"]'))).click()
+        if "O recurso substituído" in erro:
+            iframes(nav)
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[3]/td[11]/div'))).click()
+            time.sleep(2)
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[3]/td[11]/div/input'))).send_keys(Keys.CONTROL + 'A')
             time.sleep(1)
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[3]/td[11]/div/input'))).send_keys(Keys.BACKSPACE)
+            time.sleep(1)
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[3]/td[11]/div/input'))).send_keys(Keys.TAB)
+
+            carregamento(nav)
+
+            # insert
+            WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'//*[@id="movDeposConsumidos"]/thead/tr[1]/td[1]/table/tbody/tr/td[2]/table/tbody/tr/td[4]'))).click()
+
+            carregamento(nav)
+
+            WebDriverWait(nav, 1).until(EC.element_to_be_clickable((By.XPATH, '/html/body/table/tbody/tr[1]/td/div/form/table/thead/tr[1]/td[1]/table/tbody/tr/td[2]/table/tbody/tr/td[4]/div'))).click()
+            
+            carregamento(nav)
+
             nav.switch_to.default_content()
 
+            erro = verificar_se_erro(nav)
+            
     return erro
 
 def preencher_processo_pintura(nav, row):
@@ -660,9 +690,7 @@ def preencher_processo_pintura(nav, row):
     cor = row['Cor']
 
     df_cores = pd.read_excel("tintas.xlsx")
-
     print(df_cores)
-
     codigo = df_cores[(df_cores['COR_SIGLA'] == cor) & (df_cores['TIPO'] == tipo_tinta)]['CODIGO'].values[0]
 
     try:
@@ -865,8 +893,6 @@ def preencher_processo_pintura(nav, row):
             WebDriverWait(nav, 1).until(EC.element_to_be_clickable((By.XPATH, '/html/body/table/tbody/tr[1]/td/div/form/table/thead/tr[1]/td[1]/table/tbody/tr/td[2]/table/tbody/tr/td[4]/div'))).click()
 
             carregamento(nav)
-            # verifica se deu erro
-            nav.switch_to.default_content()
 
             erro = verificar_se_erro(nav)
 
@@ -994,7 +1020,21 @@ def buscando_dados(dados_planilha, indice=None):
     dados.reset_index(drop=False, inplace=True)
     dados[nomes_colunas['status_pcp']] = dados[nomes_colunas['status_pcp']].astype(str)
 
-    dados_filtrados = dados[(dados[nomes_colunas['status_pcp']] == 'None') | (dados[nomes_colunas['status_pcp']] == "")]
+    dados[nomes_colunas['data']] = pd.to_datetime(dados[nomes_colunas['data']], format='%d/%m/%Y', errors='coerce')
+
+    # Obtendo mês e ano atuais
+    mes_atual = datetime.datetime.now().month
+    ano_atual = datetime.datetime.now().year
+
+    # Filtrando apenas os dados do mês e ano atuais
+    dados_filtrados = dados[
+        (dados[nomes_colunas['data']].dt.month == mes_atual) & 
+        (dados[nomes_colunas['data']].dt.year == ano_atual)
+    ]
+
+    dados_filtrados[nomes_colunas['data']] = dados_filtrados[nomes_colunas['data']].dt.strftime('%d/%m/%Y')
+    
+    dados_filtrados = dados_filtrados[(dados_filtrados[nomes_colunas['status_pcp']] == 'None') | (dados_filtrados[nomes_colunas['status_pcp']] == "")]
 
     # Aplicar filtro de quantidade de linhas se num_linhas não for None
     if indice is not None:

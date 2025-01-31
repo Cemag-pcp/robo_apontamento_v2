@@ -69,7 +69,7 @@ def preencher_cadastro(nav, dados, wks, apontamento_atual,dados_planilha,df_ulti
                         preencher_classe(nav)
                 except:
                     sair_da_aba_e_voltar_ao_menu(nav)
-                    error = f"Erro ao preencher a classe - {valor_chave_do_apontamento}"
+                    error = f"Erro ao preencher a classe"
                     exibindo_erro_na_planilha(nav,wks,row,error,coluna_erro,valor_chave_do_apontamento)
                     continue
 
@@ -85,7 +85,7 @@ def preencher_cadastro(nav, dados, wks, apontamento_atual,dados_planilha,df_ulti
                         continue
                 except:
                     sair_da_aba_e_voltar_ao_menu(nav)
-                    error = f"Erro ao preencher a data do apontamento - {valor_chave_do_apontamento}"
+                    error = f"Erro ao preencher a data do apontamento"
                     exibindo_erro_na_planilha(nav,wks,row,error,coluna_erro,valor_chave_do_apontamento)
                     continue
                 
@@ -104,11 +104,11 @@ def preencher_cadastro(nav, dados, wks, apontamento_atual,dados_planilha,df_ulti
                         print('erro')
                 except:
                     sair_da_aba_e_voltar_ao_menu(nav)
-                    error = f"Erro ao preencher o campo de pessoa - {valor_chave_do_apontamento}"
+                    error = f"Erro ao preencher o campo de pessoa"
                     exibindo_erro_na_planilha(nav,wks,row,error,coluna_erro,valor_chave_do_apontamento)
                     continue
 
-
+                carregamento(nav)
                 #recurso
                 print("recurso")
                 try:
@@ -120,7 +120,7 @@ def preencher_cadastro(nav, dados, wks, apontamento_atual,dados_planilha,df_ulti
                         continue
                 except:
                     sair_da_aba_e_voltar_ao_menu(nav)
-                    error = f"Erro ao preencher o recurso - {valor_chave_do_apontamento}"
+                    error = f"Erro ao preencher o recurso"
                     exibindo_erro_na_planilha(nav,wks,row,error,coluna_erro,valor_chave_do_apontamento)
                     continue
 
@@ -140,7 +140,7 @@ def preencher_cadastro(nav, dados, wks, apontamento_atual,dados_planilha,df_ulti
                         continue
                 except:
                     sair_da_aba_e_voltar_ao_menu(nav)
-                    error = f"Erro ao preencher o processo - {valor_chave_do_apontamento}"
+                    error = f"Erro ao preencher o processo"
                     exibindo_erro_na_planilha(nav,wks,row,error,coluna_erro,valor_chave_do_apontamento)
                     continue
 
@@ -151,7 +151,7 @@ def preencher_cadastro(nav, dados, wks, apontamento_atual,dados_planilha,df_ulti
                     preecher_qtd_produzida(nav, row[nomes_colunas['quantidade']])
                 except:
                     sair_da_aba_e_voltar_ao_menu(nav)
-                    error = f"Erro ao preencher a quantidade produzida - {valor_chave_do_apontamento}"
+                    error = f"Erro ao preencher a quantidade produzida"
                     exibindo_erro_na_planilha(nav,wks,row,error,coluna_erro,valor_chave_do_apontamento)
                     continue
 
@@ -168,7 +168,7 @@ def preencher_cadastro(nav, dados, wks, apontamento_atual,dados_planilha,df_ulti
                             print('erro')
                 except:
                     sair_da_aba_e_voltar_ao_menu(nav)
-                    error = f"Erro ao preencher a quantidade desviada - {valor_chave_do_apontamento}"
+                    error = f"Erro ao preencher a quantidade desviada"
                     exibindo_erro_na_planilha(nav,wks,row,error,coluna_erro,valor_chave_do_apontamento)
                     continue
                 
@@ -184,7 +184,7 @@ def preencher_cadastro(nav, dados, wks, apontamento_atual,dados_planilha,df_ulti
                         print('erro')
                 except:
                     sair_da_aba_e_voltar_ao_menu(nav)
-                    error = f"Erro ao preencher o dep destino - {valor_chave_do_apontamento}"
+                    error = f"Erro ao preencher o dep destino"
                     exibindo_erro_na_planilha(nav,wks,row,error,coluna_erro,valor_chave_do_apontamento)
                     continue
 
@@ -207,7 +207,7 @@ def preencher_cadastro(nav, dados, wks, apontamento_atual,dados_planilha,df_ulti
                         erro = preencher_processo_corte(nav, row, erro)
                     except:
                         sair_da_aba_e_voltar_ao_menu(nav)
-                        error = f"Erro ao preencher os dados de corte (Mov. de depósito) - {valor_chave_do_apontamento}"
+                        error = f"Erro ao preencher os dados de corte (Mov. de depósito)"
                         exibindo_erro_na_planilha(nav,wks,row,error,coluna_erro,valor_chave_do_apontamento)
                         continue
 
@@ -218,7 +218,7 @@ def preencher_cadastro(nav, dados, wks, apontamento_atual,dados_planilha,df_ulti
                         erro = preencher_processo_pintura(nav, row)
                     except:
                         sair_da_aba_e_voltar_ao_menu(nav)
-                        error = f"Erro ao preencher os dados de pintura (Mov. de depósito) - {valor_chave_do_apontamento}"
+                        error = f"Erro ao preencher os dados de pintura (Mov. de depósito)"
                         exibindo_erro_na_planilha(nav,wks,row,error,coluna_erro,valor_chave_do_apontamento)
                         continue
 
@@ -233,12 +233,12 @@ def preencher_cadastro(nav, dados, wks, apontamento_atual,dados_planilha,df_ulti
                     print('OK')
                     ultimo_status_apontamento = 'OK'
                     wks.update_acell(coluna_ok + str(row['index'] + 1), f'OK {data_hoje()} {hora_atual()}')
-
         else:
             return "Sem dados para apontar"
     except:
         return f"Erro inesperado ao apontar o {apontamento_atual}, reiniciando processo de apontamento"
-
+    
+    sair_da_aba_e_voltar_ao_menu(nav)
     return "Sem dados para apontar"
 
 status_execucao = ""
