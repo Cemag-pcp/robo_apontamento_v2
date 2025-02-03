@@ -543,7 +543,15 @@ def preencher_processo_corte(nav, row, erro):
 
     recurso_movimento_deposito = WebDriverWait(nav, 10).until(EC.element_to_be_clickable((
         By.XPATH, '//*[@id="0"]/td[9]/div/div'))).text
-    chapa_atual = str(recurso_movimento_deposito).split('-')[0].strip() if '-' in str(recurso_movimento_deposito) else str(recurso_movimento_deposito)
+    try:
+        chapa_atual = str(recurso_movimento_deposito).split('-')[0].strip() if '-' in str(recurso_movimento_deposito) else str(recurso_movimento_deposito)
+    except:
+        if erro:
+            erro_consumo = f"Não possui dados para consumo, verifique se foi apontado"
+        else:
+            erro_consumo = None
+        nav.switch_to.default_content()
+        return erro_consumo
     peso_antigo_webdrive = WebDriverWait(nav, 10).until(EC.element_to_be_clickable((
         By.XPATH, '//*[@id="0"]/td[26]/div/div')))
     peso_antigo = float(peso_antigo_webdrive.text)

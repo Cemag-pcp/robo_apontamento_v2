@@ -221,7 +221,7 @@ def preencher_cadastro(nav, dados, wks, apontamento_atual,dados_planilha,df_ulti
                         error = f"Erro ao preencher os dados de pintura (Mov. de depósito)"
                         exibindo_erro_na_planilha(nav,wks,row,error,coluna_erro,valor_chave_do_apontamento)
                         continue
-
+                
                 if erro:
                     print(erro)
                     exibindo_erro_na_planilha(nav,wks,row,erro,coluna_erro, valor_chave_do_apontamento)
