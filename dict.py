@@ -9,6 +9,7 @@ dados_planilha = {
         "coluna_da_chave":"P",
         "nome_das_colunas": {
             "data": "Data finalização",
+            "Transf. chapa": "Transf. chapa",
             "codigo": "Peça",
             "funcionário": "Operador",
             "quantidade": "Qt. Plan.",
@@ -26,7 +27,7 @@ dados_planilha = {
         "coluna_da_chave":"M",
         "nome_das_colunas": {
             "data": "DATA",
-            "codigo": "CÓDIGO TRATADO",
+            "codigo": "CÓDIGO",
             "funcionário": "MATRICULA",
             "quantidade": "QTD PROD",
             "mortas":"Nº DE MORTAS",

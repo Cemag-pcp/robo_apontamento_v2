@@ -426,7 +426,7 @@ def preencher_recurso(nav, codigo):
     recurso_input = WebDriverWait(nav, 10).until(EC.element_to_be_clickable((
         By.XPATH, '//*[@id="producoes"]//input[@name="RECURSO"]')))
     recurso_input.send_keys(Keys.CONTROL + 'A')
-    time.sleep(.5)
+    time.sleep(1.5)
     recurso_input.send_keys(codigo)
     time.sleep(3)
     recurso_input.send_keys(Keys.TAB)
@@ -536,6 +536,7 @@ def preencher_processo_corte(nav, row, erro):
     dados_espessura_chapa = leitura_google_planilhas_apoio_chapas()
 
     chapa = row['Código Chapa']
+    print(chapa)
     if chapa == None:
         chapa = ""
 
@@ -555,23 +556,23 @@ def preencher_processo_corte(nav, row, erro):
     peso_antigo_webdrive = WebDriverWait(nav, 10).until(EC.element_to_be_clickable((
         By.XPATH, '//*[@id="0"]/td[26]/div/div')))
     peso_antigo = float(peso_antigo_webdrive.text)
-    try:
-        espessura_antiga = float(dados_espessura_chapa[dados_espessura_chapa['CODIGO'] == chapa_atual].ESPESSURA.values[0].replace(" mm","").replace(",","."))
-    except:
-        erro = f"A Chapa: {chapa_atual}, não foi encontrada na aba 'Apoio Chapa'"
-        nav.switch_to.default_content()
-        return erro
     
     print("Peso Antigo")
     print(peso_antigo)
-    print("Espessura Antiga")
-    print(espessura_antiga)
 
     if chapa_atual == chapa or chapa == "": 
         print('Chapa igual, não precisa fazer nada')
         nav.switch_to.default_content()
         return erro
     else:
+        try:
+            espessura_antiga = float(dados_espessura_chapa[dados_espessura_chapa['CODIGO'] == chapa_atual].ESPESSURA.values[0].replace(" mm","").replace(",","."))
+        except:
+            erro = f"A Chapa: {chapa_atual}, não foi encontrada na aba 'Apoio Chapa'"
+            nav.switch_to.default_content()
+            return erro
+        print("Espessura Antiga")
+        print(espessura_antiga)
         try:
             espessura_nova = float(dados_espessura_chapa[dados_espessura_chapa['CODIGO'] == chapa].ESPESSURA.values[0].replace(" mm","").replace(",","."))
         except:
@@ -1015,7 +1016,7 @@ def leitura_google_planilhas_apoio_chapas():
 
     return dados
 
-def buscando_dados(dados_planilha, indice=None):
+def buscando_dados(dados_planilha, apontamento_atual ,indice=None):
     # Parâmetros: Nome da Aba e Chave da planilha
     dados, wks = leitura_google_planilhas(dados_planilha['nome_aba'], dados_planilha['chave_planilha'])
 
@@ -1044,6 +1045,9 @@ def buscando_dados(dados_planilha, indice=None):
     
     dados_filtrados = dados_filtrados[(dados_filtrados[nomes_colunas['status_pcp']] == 'None') | (dados_filtrados[nomes_colunas['status_pcp']] == "")]
 
+    if apontamento_atual == 'corte':
+        dados_filtrados = dados_filtrados[(dados_filtrados[nomes_colunas['Transf. chapa']] != 'None') & (dados_filtrados[nomes_colunas['Transf. chapa']] != "")]
+        
     # Aplicar filtro de quantidade de linhas se num_linhas não for None
     if indice is not None:
         dados_filtrados = dados_filtrados[dados_filtrados['index'] == indice]

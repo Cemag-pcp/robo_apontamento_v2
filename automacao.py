@@ -29,7 +29,7 @@ def preencher_cadastro(nav, dados, wks, apontamento_atual,dados_planilha,df_ulti
 
                 print("INDEX")
                 print(row['index'])
-                planilha, wks = buscando_dados(dados_planilha, row['index'])
+                planilha, wks = buscando_dados(dados_planilha, apontamento_atual, row['index'])
 
                 # Identificar se preencheram o OK manualmente nessa linha
                 if planilha.empty:
@@ -252,7 +252,7 @@ while True:
             nav = webdriver.Chrome(chrome_driver_path)
 
         nav.maximize_window()
-        nav.get("http://192.168.3.141/sistema")
+        nav.get("http://192.168.3.140/sistema")
         # nav.get("https://hcemag.innovaro.com.br/sistema/")
 
         login(nav)
@@ -275,7 +275,7 @@ while True:
             if ultimo_erro == apontamento_atual:
                 continue
 
-            dados, wks = buscando_dados(value)
+            dados, wks = buscando_dados(value, apontamento_atual)
 
             status_execucao = preencher_cadastro(nav, dados, wks, apontamento_atual,value,df_ultimo_apontamento_que_gerou_um_erro)
 
