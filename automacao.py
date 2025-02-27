@@ -13,7 +13,7 @@ def preencher_cadastro(nav, dados, wks, apontamento_atual,dados_planilha,df_ulti
 
         # Esse status serve para informar o status do ultimo apontamento, pois se tiver dado OK,
         # não tem necessidade de mudar de visão
-        ultimo_status_apontamento = ""
+        # ultimo_status_apontamento = ""
 
         nomes_colunas = dados_planilha['nome_das_colunas']
         processo = dados_planilha['processo']
@@ -29,6 +29,7 @@ def preencher_cadastro(nav, dados, wks, apontamento_atual,dados_planilha,df_ulti
 
                 print("INDEX")
                 print(row['index'])
+
                 planilha, wks = buscando_dados(dados_planilha, apontamento_atual, row['index'])
 
                 # Identificar se preencheram o OK manualmente nessa linha
@@ -37,10 +38,7 @@ def preencher_cadastro(nav, dados, wks, apontamento_atual,dados_planilha,df_ulti
                     aguardando_requisicao_google_sheets(segundos)
                     continue
                 
-                if ultimo_status_apontamento != "OK":
-                    mudar_visao(nav)
-
-                ultimo_status_apontamento = ""
+                mudar_visao(nav)
 
                 try:
                     clicar_em_add(nav)
@@ -49,6 +47,7 @@ def preencher_cadastro(nav, dados, wks, apontamento_atual,dados_planilha,df_ulti
                     continue
 
                 # classe
+                carregamento(nav)
                 print("chave")
                 try:
                     valor_chave_do_apontamento = enviar_chave_para_planilha(wks, row, nav, coluna_chave)
@@ -228,11 +227,12 @@ def preencher_cadastro(nav, dados, wks, apontamento_atual,dados_planilha,df_ulti
                     carregamento(nav)
                 else:
                     iframes(nav)
+                    carregamento(nav)
                     clicar_em_add(nav)
                     carregamento(nav)
                     print('OK')
-                    ultimo_status_apontamento = 'OK'
                     wks.update_acell(coluna_ok + str(row['index'] + 1), f'OK {data_hoje()} {hora_atual()}')
+                    sair_da_aba_e_voltar_ao_menu(nav)
         else:
             return "Sem dados para apontar"
     except:

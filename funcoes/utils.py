@@ -336,7 +336,13 @@ def sair_da_aba_e_voltar_ao_menu(nav):
 
     WebDriverWait(nav, 1).until(EC.element_to_be_clickable((
         By.XPATH, "//span[contains(@onclick, 'Environment.getInstance().closeTab')]/div"))).click()
-    time.sleep(1.5)
+    time.sleep(2)
+
+    close_button = nav.find_elements(By.XPATH, "//span[contains(@onclick, 'Environment.getInstance().closeTab')]/div")
+    if close_button:
+        # Se o botão ainda existir, tenta clicar novamente
+        close_button[0].click()
+        
     clicando_producao_menu_aberto(nav)
 
 def erro_na_data(nav,wks,row,erro):
@@ -905,6 +911,13 @@ def preencher_processo_pintura(nav, row):
 
             erro = verificar_se_erro(nav)
             
+            if erro:
+                iframes(nav)
+                WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[1]/td/div/form/table/thead/tr[1]/td[1]/table/tbody/tr/td[2]/table/tbody/tr/td[5]/div'))).click()
+                carregamento(nav)
+                nav.switch_to.default_content()
+                WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'//*[@id="answers_0"]'))).click()
+
             if erro and "O recurso substituído" in erro:
                 iframes(nav)
                 WebDriverWait(nav, 5).until(EC.element_to_be_clickable((By.XPATH, f'/html/body/table/tbody/tr[2]/td/div/form/table/tbody/tr[1]/td[1]/table/tbody/tr[{linha_maxima - 2}]/td[11]/div'))).click()
@@ -929,6 +942,7 @@ def preencher_processo_pintura(nav, row):
                 nav.switch_to.default_content()
 
                 erro = verificar_se_erro(nav)
+            
 
     return erro
 
